@@ -23,6 +23,7 @@ from datetime import datetime
 from ..normalize import INTERPRETERS, parent_dirs, parse_command
 
 SUID_DIRS = ("/usr/local", "/opt", "/home", "/tmp")
+WRITABLE_DIRS = ("/usr/local", "/opt")  # /tmp e /home têm muito arquivo o+w legítimo: ruído
 MAX_JOURNAL = 1000
 
 
@@ -97,22 +98,24 @@ def _entry(path: str, tz) -> dict | None:
             "src": f"stat {path}"}
 
 
-def _suid_files() -> set[str]:
+def _candidate_files() -> set[str]:
+    """Setuid em SUID_DIRS (R4) e arquivos regulares o+w em WRITABLE_DIRS (R6: gravável sem consumidor)."""
     found = set()
     for base in SUID_DIRS:
         for root, _, files in os.walk(base, onerror=lambda e: None):
             for f in files:
                 p = os.path.join(root, f)
                 try:
-                    if os.lstat(p).st_mode & st.S_ISUID:
-                        found.add(p)
+                    mode = os.lstat(p).st_mode
                 except OSError:
-                    pass
+                    continue
+                if mode & st.S_ISUID or (base in WRITABLE_DIRS and st.S_ISREG(mode) and mode & st.S_IWOTH):
+                    found.add(p)
     return found
 
 
 def _permissions(procs: list[dict], services: list[dict], tz) -> list[dict]:
-    paths = set(_suid_files())
+    paths = set(_candidate_files())
     for cmd in [p["cmd"] for p in procs] + [s["execstart"] for s in services]:
         exe, _, _, script = parse_command(cmd)
         paths.update(x for x in (exe, script) if x)

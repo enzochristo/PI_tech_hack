@@ -35,7 +35,7 @@ def run(inv: Inventory, g: Graph, prior: list[Finding]) -> list[Finding]:
                 b.add(entry.src, f"{entry.mtime}: mtime de {entry.path}")
                 order = (f"; o mtime do recurso é {'anterior' if before else 'POSTERIOR'} ao login"
                          + ("" if before else " (compatível com alteração pelo usuário)"))
-            b.add(r1.evidences[0].source, f"{r1.uid} (R1): {svc.unit} executa {r1.target} como root, alterável por não-root")
+            b.add(f"{r1.uid} (R1)", f"{svc.unit} executa {r1.target} como root, alterável por não-root")
             out.append(make_finding(
                 META, user, "Usuário comum presente enquanto recurso alterável é usado por root",
                 f"{user} entrou em {ev.timestamp} e {r1.target} (usado por {svc.unit}) é alterável por não-root{order}.", b))
