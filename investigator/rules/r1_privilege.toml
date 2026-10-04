@@ -1,0 +1,18 @@
+id = "R1"
+title = "Relação de privilégio insegura"
+severity = 4
+confidence = 2
+classification = "RISCO"
+interpretation = "Um recurso executado com identidade privilegiada (UID 0) pode ser alterado ou substituído por uma identidade não privilegiada: quem controla o recurso controla o que o root executa."
+not_proven = "Não há evidência de que o recurso foi alterado ou explorado; o achado descreve a possibilidade, não o fato."
+missing_evidence = [
+  "hash do recurso comparado com um baseline conhecido",
+  "registro de auditoria (auditd) de escrita no recurso",
+  "membros do grupo e usuários locais que de fato têm acesso de escrita",
+]
+false_positives = [
+  "diretório com sticky bit (impede apagar/renomear arquivos de outros donos)",
+  "serviço com DynamicUser= (não roda com usuário privilegiado fixo; não coletado neste dataset)",
+  "serviço com RootImage= (roda em imagem de filesystem isolada; não coletado neste dataset)",
+  "permissões de diretórios acima do coletado (ex.: /opt, /) não verificadas",
+]

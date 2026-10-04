@@ -1,0 +1,15 @@
+id = "R6"
+title = "Configuração inadequada isolada"
+severity = 2
+confidence = 2
+classification = "CONFIGURACAO_INADEQUADA"
+interpretation = "O arquivo tem permissão de escrita para qualquer usuário, mas nenhum serviço ou processo coletado o utiliza. É uma configuração inadequada; não há identidade privilegiada ligada a ele neste snapshot."
+not_proven = "Não há evidência de que o arquivo seja executado por uma identidade privilegiada, nem de exploração."
+missing_evidence = [
+  "tarefas agendadas (cron/systemd timers) ou scripts que invoquem o arquivo",
+  "histórico de execução do arquivo (auditd, shell history)",
+]
+false_positives = [
+  "arquivo usado por um consumidor fora do snapshot (cron, timer, execução manual esporádica)",
+  "arquivo gravável por design (ex.: área de troca, log compartilhado)",
+]

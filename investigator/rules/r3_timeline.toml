@@ -1,0 +1,16 @@
+id = "R3"
+title = "Linha do tempo: usuário comum presente enquanto existe recurso alterável usado por root"
+severity = 2
+confidence = 2
+classification = "CONTEXTO"
+interpretation = "Reconstrução temporal ligando serviço, sessão de usuário e mtime do recurso. A presença do usuário torna a hipótese de exploração possível, mas a ordem dos eventos é o que a sustenta ou enfraquece."
+not_proven = "Presença de uma sessão não prova uso do recurso; o mtime não prova a ausência de alteração (pode ser forjado) e depende de relógio e fuso."
+missing_evidence = [
+  "auditd de escrita no recurso",
+  "histórico do shell do usuário",
+  "hash do recurso comparado com um baseline",
+]
+false_positives = [
+  "usuário legítimo que apenas administra a máquina",
+  "horários sem fuso confiável: a linha do tempo é aproximada",
+]

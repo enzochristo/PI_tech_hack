@@ -1,0 +1,14 @@
+id = "R7"
+title = "Uso legítimo de privilégio"
+severity = 1
+confidence = 3
+classification = "LEGITIMO"
+interpretation = "O serviço executa como root e usa um script, mas o script e os diretórios coletados até a raiz só podem ser alterados por root. A identidade privilegiada está sendo usada de forma coerente com o controle de acesso."
+not_proven = "A verificação cobre apenas as permissões coletadas; não prova que o conteúdo do script é benigno."
+missing_evidence = [
+  "hash do script comparado com um baseline conhecido",
+]
+false_positives = [
+  "permissões de diretórios acima do coletado (ex.: /opt, /) não verificadas",
+  "conteúdo do script não analisado (pode ser malicioso mesmo com permissões corretas)",
+]

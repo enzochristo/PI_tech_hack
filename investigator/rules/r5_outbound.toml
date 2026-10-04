@@ -1,0 +1,15 @@
+id = "R5"
+title = "Saída de rede privilegiada"
+severity = 2
+confidence = 1
+classification = "INCONCLUSIVO"
+interpretation = "Um processo root, filho de um serviço, executa curl/wget para um destino remoto. Isso é comum em serviços de backup, atualização e monitoramento e não é, por si só, C2 ou exfiltração."
+not_proven = "Não há evidência de que a conexão seja maliciosa; o nome do destino e do cliente não bastam para classificá-la."
+missing_evidence = [
+  "conexões de rede ativas do processo (ss/netstat) e resolução do destino",
+  "conteúdo/payload enviado e comparação com o comportamento esperado do serviço",
+  "reputação e propriedade do destino",
+]
+false_positives = [
+  "checagem de status, atualização ou envio de métricas legítimos do serviço",
+]

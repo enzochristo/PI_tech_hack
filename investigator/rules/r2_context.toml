@@ -1,0 +1,17 @@
+id = "R2"
+title = "Contexto de execução: processo root originado de processo de usuário comum"
+severity = 3
+confidence = 1
+classification = "CONTEXTO"
+interpretation = "Um processo com UID 0 é filho direto de um processo de usuário comum, e o journal não registra sudo nem su. A elevação aconteceu por um mecanismo que o snapshot não mostra."
+not_proven = "Não está provado que a elevação foi indevida: sudo/su sem log coletado, binário setuid legítimo ou shell de manutenção produzem o mesmo quadro."
+missing_evidence = [
+  "registro de auditoria (auditd/execve) do momento em que o processo ganhou UID 0",
+  "histórico do shell do usuário de origem",
+  "binários setuid executados pelo usuário nesse período",
+]
+false_positives = [
+  "sudo/su cujo log não foi coletado (journal incompleto ou rotacionado)",
+  "sessão administrativa legítima (ex.: usuário com permissão de sudo)",
+  "binário setuid padrão do sistema executado pelo usuário",
+]
