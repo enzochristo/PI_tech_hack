@@ -127,3 +127,4 @@ class Finding:
     uid: str = ""
     verdict: str = ""  # H1 | H2 | H3 | INCONCLUSIVO (preenchido pelo ACH)
     ach: dict | None = None
+    correlates: list[str] = field(default_factory=list)  # fontes cruzadas pela regra

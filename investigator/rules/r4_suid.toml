@@ -13,3 +13,4 @@ missing_evidence = [
 false_positives = [
   "binário setuid legítimo instalado por software de terceiros em /opt ou /usr/local",
 ]
+correlates = ["permissoes"]

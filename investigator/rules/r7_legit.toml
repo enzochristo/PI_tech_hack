@@ -12,3 +12,4 @@ false_positives = [
   "permissões de diretórios acima do coletado (ex.: /opt, /) não verificadas",
   "conteúdo do script não analisado (pode ser malicioso mesmo com permissões corretas)",
 ]
+correlates = ["servicos", "permissoes", "processos"]

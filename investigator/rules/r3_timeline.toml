@@ -14,3 +14,4 @@ false_positives = [
   "usuário legítimo que apenas administra a máquina",
   "horários sem fuso confiável: a linha do tempo é aproximada",
 ]
+correlates = ["servicos", "logs", "permissoes"]

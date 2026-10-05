@@ -51,6 +51,41 @@ class Graph:
     def attr(self, node: Node, name: str):
         return self.nodes.get(node, {}).get(name)
 
+    # ---- visualização (eventos de log ficam de fora para não poluir) ----
+    def _visible(self) -> list[Edge]:
+        return [e for edges in self._out.values() for e in edges
+                if "logevent" not in (e.src[0], e.dst[0])]
+
+    @staticmethod
+    def _label(n: Node) -> str:
+        return f"{n[0]}:{n[1]}"
+
+    def to_text(self) -> str:
+        by_type: dict[str, list[Edge]] = defaultdict(list)
+        for e in self._visible():
+            by_type[e.type].append(e)
+        lines = ["GRAFO DE PROVENIÊNCIA (arestas por tipo; eventos de log omitidos)"]
+        for etype, edges in sorted(by_type.items()):
+            lines.append(f"\n{etype}  ({len(edges)})")
+            lines += [f"  {self._label(e.src)}  ->  {self._label(e.dst)}" for e in edges[:40]]
+            if len(edges) > 40:
+                lines.append(f"  ... +{len(edges) - 40} arestas")
+        return "\n".join(lines)
+
+    def to_dot(self) -> str:
+        shapes = {"process": "ellipse", "service": "box", "file": "note", "dir": "folder",
+                  "user": "diamond", "remote": "hexagon"}
+        lines = ["digraph provenance {", "  rankdir=LR; node [fontsize=10]; edge [fontsize=9];"]
+        used: set[Node] = set()
+        edges = self._visible()
+        for e in edges:
+            used |= {e.src, e.dst}
+        for n in used:
+            lines.append(f'  "{self._label(n)}" [shape={shapes.get(n[0], "ellipse")}];')
+        for e in edges:
+            lines.append(f'  "{self._label(e.src)}" -> "{self._label(e.dst)}" [label="{e.type}"];')
+        return "\n".join(lines + ["}"])
+
 
 def build_graph(inv: Inventory) -> Graph:
     g = Graph()

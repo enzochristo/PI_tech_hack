@@ -89,10 +89,10 @@ devem coincidir com o início dos hashes em "Artefatos analisados".
 ```bash
 sudo apt install -y jq
 sudo python3 -m investigator --live --format json --output /tmp/base.json
-jq '.findings[] | {regra: .finding_info.analytic.uid, alvo: .investigation.target, veredito: .investigation.verdict, severidade}' /tmp/base.json
+jq '.findings[] | {regra: .finding_info.analytic.uid, alvo: .investigation.target, veredito: .investigation.verdict, severidade: .severity}' /tmp/base.json
 ```
 
-**Interpretar:** a coleta pode levar de 30 s a alguns minutos (varredura de setuid). Em uma Kali limpa espere
+**Interpretar:** `veredito` vazio é normal em R3 e R4 (não têm matriz ACH). A coleta pode levar de 30 s a alguns minutos (varredura de setuid). Em uma Kali limpa espere
 poucos findings. Um R4 em setuid de software de terceiros em `/opt` ou `/usr/local` é um falso positivo
 conhecido, listado nos falsos positivos da regra.
 

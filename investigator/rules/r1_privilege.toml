@@ -16,3 +16,4 @@ false_positives = [
   "serviço com RootImage= (roda em imagem de filesystem isolada; não coletado neste dataset)",
   "permissões de diretórios acima do coletado (ex.: /opt, /) não verificadas",
 ]
+correlates = ["processos", "servicos", "permissoes"]

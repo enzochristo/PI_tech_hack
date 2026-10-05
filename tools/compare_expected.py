@@ -13,7 +13,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from investigator import progress  # noqa: E402
 from investigator.__main__ import investigate  # noqa: E402
+
+progress.enabled = False
 
 IMPLEMENTED = {"R1", "R2", "R3", "R4", "R5", "R6", "R7"}
 

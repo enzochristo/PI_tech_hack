@@ -21,7 +21,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
+from investigator import progress  # noqa: E402
 from investigator.__main__ import investigate  # noqa: E402
+
+progress.enabled = False
 
 IMPLEMENTED = {"R1", "R2", "R3", "R4", "R5", "R6", "R7"}
 SCENARIOS = ["normal", "permission", "privileged_service", "correlation", "ambiguous",

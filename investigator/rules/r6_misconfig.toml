@@ -13,3 +13,4 @@ false_positives = [
   "arquivo usado por um consumidor fora do snapshot (cron, timer, execução manual esporádica)",
   "arquivo gravável por design (ex.: área de troca, log compartilhado)",
 ]
+correlates = ["permissoes", "processos", "servicos"]

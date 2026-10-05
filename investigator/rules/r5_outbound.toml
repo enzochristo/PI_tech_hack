@@ -13,3 +13,4 @@ missing_evidence = [
 false_positives = [
   "checagem de status, atualização ou envio de métricas legítimos do serviço",
 ]
+correlates = ["processos", "servicos", "logs", "permissoes"]

@@ -8,6 +8,7 @@ from __future__ import annotations
 from datetime import datetime
 
 from .. import scenario
+from . import correlation
 from ..model import Finding, Inventory
 
 SEVERITY = {1: "Informational", 2: "Low", 3: "Medium", 4: "High", 5: "Critical"}
@@ -53,5 +54,7 @@ def to_report(findings: list[Finding], inv: Inventory) -> dict:
         "tool": "endpoint-investigator",
         "artifacts": inv.artifacts,
         "scenario_score": scenario.score(findings),
+        "correlation_matrix": {"capability": correlation.static_matrix(),
+                               "this_snapshot": correlation.dynamic_matrix(findings)},
         "findings": [to_ocsf(f, inv) for f in findings],
     }

@@ -95,4 +95,5 @@ def make_finding(meta_file: str, target: str, title: str, description: str, b: B
         classification=m["classification"], evidences=b.items,
         interpretation=interpretation or m["interpretation"],
         missing_evidence=list(dict.fromkeys([*m["missing_evidence"], *missing])),
-        not_proven=m["not_proven"], false_positives=m["false_positives"])
+        not_proven=m["not_proven"], false_positives=m["false_positives"],
+        correlates=m.get("correlates", []))

@@ -20,6 +20,7 @@ import subprocess
 import sys
 from datetime import datetime
 
+from .. import progress
 from ..normalize import INTERPRETERS, parent_dirs, parse_command
 
 SUID_DIRS = ("/usr/local", "/opt", "/home", "/tmp")
@@ -150,8 +151,14 @@ def collect() -> dict:
     offset = datetime.now().astimezone().utcoffset()
     total = int(offset.total_seconds() // 60)
     sign = "-" if total < 0 else "+"
-    procs, services = _processes(), _services()
-    raw = {"processes": procs, "services": services, "journal": _journal(tz),
+    progress.say("      lendo processos (/proc)...")
+    procs = _processes()
+    progress.say("      lendo serviços (systemctl)...")
+    services = _services()
+    progress.say("      lendo o journal (journalctl)...")
+    journal = _journal(tz)
+    progress.say("      coletando permissões e procurando setuid/arquivos graváveis (pode demorar)...")
+    raw = {"processes": procs, "services": services, "journal": journal,
            "permissions": _permissions(procs, services, tz),
            "meta": {"timezone": f"{sign}{abs(total) // 60:02d}:{abs(total) % 60:02d}",
                     "year": datetime.now().year}}
