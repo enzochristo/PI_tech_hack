@@ -1,7 +1,7 @@
 # Endpoint Investigator — Documento Técnico
 
 **Disciplina:** Tecnologias Hackers · Prof. Rodolfo Avelino · Avaliação Intermediária
-**Grupo:** [preencher nomes] · **Apresentação:** 6 de outubro
+**Grupo:** Enzo Christofoletti, Thomas Rudge e Thomas Kassabian · **Apresentação:** 6 de outubro
 
 ---
 
@@ -65,7 +65,7 @@ dataset|live   campos ECS      entidades e relações      TOML + Python    pré
   matriz ACH vão num bloco de extensão `investigation`. Severidade (impacto se verdadeira) e confiança (força
   da evidência) são eixos separados.
 
-Stack: Python 3.10+, **somente biblioteca padrão**, cerca de 1.350 linhas.
+Stack: Python 3.10+, **somente biblioteca padrão**, cerca de 1.900 linhas (1.500 sem a camada de LLM).
 
 ## 4. Principais correlações
 
@@ -81,6 +81,12 @@ Stack: Python 3.10+, **somente biblioteca padrão**, cerca de 1.350 linhas.
 
 Correlações pedidas no enunciado: processo + serviço + permissão (R1); processo + PPID + usuário (R2); serviço
 + arquivo + usuário (R1); processo + serviço + log (R3, mais linhas de log em R1 e R5).
+
+**Matriz de correlação entre fontes.** Cada regra declara em seu `.toml` quais fontes cruza, e a ferramenta
+deriva daí a matriz (`--matrix`): capacidade (o que pode ser correlacionado) e o que foi de fato correlacionado
+no snapshot. As chaves de ligação são: processo × serviço (comando = `ExecStart`, `MainPID`, PID no journal);
+processo/serviço × permissão (script ou binário = caminho do arquivo); processo × log (PID); serviço × log (nome
+do serviço); permissão × log (mtime × horário do evento). `--graph` e `--graph-dot` mostram o grafo de proveniência.
 
 **Matriz ACH, exemplo (cenário `correlation`, R1).** Hipóteses: H1 legítimo, H2 má configuração explorável sem
 exploração observada, H3 exploração já ocorreu.
@@ -121,12 +127,14 @@ o nome correto no metadata; horários com fuso real; cenários novos (`writable_
 
 ## 6. Resultados e avaliação
 
-`tools/evaluate.py` gera lotes (8 cenários × 12 seeds = 96 datasets), roda a ferramenta e compara com o
-gabarito. Resultado: **precisão e recall 1,00 para R1 a R7** e todos os vereditos ACH esperados atingidos.
+`tools/evaluate.py --seeds 12` gera lotes (8 cenários × 12 seeds = 96 datasets), roda a ferramenta e compara
+com o gabarito. Resultado: **precisão e recall 1,00 para R1 a R7** e todos os vereditos ACH esperados atingidos.
+A seed só varia o cenário `random` (nome do serviço, PIDs, modo do script); os outros sete são fixos. Os 96
+datasets correspondem, portanto, a **19 conjuntos distintos** (7 fixos + 12 variações de `random`).
 
 **Como interpretar:** os findings esperados vêm do gerador; o gabarito de **vereditos** foi derivado por nós do
 raciocínio de cada cenário. O número mede coerência do motor com esse raciocínio, não verdade absoluta, e **não
-prova generalização** para outras fontes de dados.
+prova generalização**: com poucos conjuntos distintos, o teste confirma a lógica, não a robustez estatística.
 
 **Modo ao vivo na Kali.** Em laboratório controlado (`/opt/lab`, com script de serviço, setuid inofensivo,
 arquivo `0777` órfão e `curl` para um IP que não responde), verificamos:
@@ -148,7 +156,7 @@ regras operam sobre fatos do sistema e não sobre valores fixos.
 Ferramentas de IA (Claude) foram usadas **no desenvolvimento**: apoio à programação, à documentação, à
 revisão do desenho e à explicação dos resultados, como o enunciado permite. Em **tempo de execução**, coleta,
 normalização, correlação, hipóteses e veredito são produzidos por código determinístico. Há uma camada de LLM
-**opcional** (`--llm`, API da OpenAI) que apenas redige a explicação de findings já prontos. Ela recebe só os
+**opcional** (`--llm` ou `ENDPOINT_LLM=on` no `.env`; API da OpenAI) que apenas redige a explicação de findings já prontos. Ela recebe só os
 findings (nunca os dados crus), devolve JSON com schema fixo em que toda afirmação cita um id de evidência, e
 um **verificador** descarta o que cita evidência inexistente, menciona caminho/IP/PID ausente das evidências ou
 afirma exploração sem base. A LLM não altera classificação nem veredito; a discordância aparece como segunda
@@ -175,6 +183,11 @@ Como o snapshot não vê cron nem timers, "arquivo sem consumidor" (R6) é evid�
 
 **Modo ao vivo.** Apenas serviços em execução; journal limitado às últimas 1000 linhas; sem root a visão é
 parcial; a busca de setuid pode levar de 30 s a alguns minutos.
+
+**Camada LLM.** O verificador descarta invenções (evidência inexistente, caminho, IP ou PID ausentes), mas **não
+detecta erros de raciocínio**: em teste, um modelo pequeno discordou do veredito com um argumento incorreto. Por
+isso a LLM nunca altera o veredito e sua saída é tratada como texto auxiliar, enviado a um serviço externo (os
+findings, não os dados crus).
 
 **Falsos positivos conhecidos.** R1: sticky bit e permissões acima do coletado. R2: sudo/su com log não
 coletado. R4: setuid legítimo de terceiros (ex.: `chrome-sandbox`). R5: checagem de status ou métricas
