@@ -111,6 +111,7 @@ minutos por causa da busca de arquivos setuid.
 | `--matrix` | Imprime a matriz de correlação entre fontes (capacidade e neste snapshot) |
 | `--graph` / `--graph-dot ARQ` | Imprime as relações do grafo / grava o grafo em DOT (graphviz) |
 | `--llm` / `--llm-model M` | Camada opcional de explicação por LLM (OpenAI), verificada |
+| `--no-llm` | Desliga a LLM mesmo com `ENDPOINT_LLM=on` no `.env` (use nas demos sem rede) |
 | `--quiet` | Não imprime as mensagens de progresso (que vão para o stderr) |
 | `--output ARQ` | Grava a saída em arquivo |
 
@@ -380,7 +381,7 @@ O OCSF não tem campos para interpretação e hipóteses; eles vão no bloco de 
 
 ### 10.1 Camada LLM opcional (OpenAI)
 
-Ligada por `--llm`. Sem a flag nada muda. Ideia: **dados → evidências estruturadas → (só então) LLM**, como o
+Ligada por `--llm` ou por `ENDPOINT_LLM=on` no `.env`; `--no-llm` desliga nos dois casos. Ideia: **dados → evidências estruturadas → (só então) LLM**, como o
 enunciado exige.
 
 - **Entrada:** a LLM recebe **apenas os findings já produzidos** (evidências com id e origem, matriz ACH,
@@ -397,7 +398,8 @@ enunciado exige.
   determinístico normalmente.
 
 ```bash
-export OPENAI_API_KEY='sua-chave'            # só no terminal; nunca em arquivo do projeto
+cp .env.example .env                         # preencha OPENAI_API_KEY; o .env está no .gitignore
+# ou, sem arquivo: export OPENAI_API_KEY='sua-chave'
 python3 -m investigator --dataset training/correlation --llm
 # ao vivo: gere o JSON com sudo e rode a LLM como usuário comum (a chave não passa pelo sudo)
 sudo python3 -m investigator --live --format json --output /tmp/live.json
