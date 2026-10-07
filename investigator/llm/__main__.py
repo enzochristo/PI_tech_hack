@@ -9,10 +9,12 @@ import json
 import sys
 
 from .client import LLMError, explain
+from .env import load_dotenv
 from .verify import render, verify
 
 
 def main() -> None:
+    load_dotenv()  # a chave pode estar só no .env, como no comando principal
     if len(sys.argv) != 2:
         sys.exit(__doc__)
     report = json.load(open(sys.argv[1], encoding="utf-8"))
